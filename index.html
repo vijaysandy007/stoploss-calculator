@@ -19,6 +19,10 @@
   <label>Take-Profit (%):</label>
   <input id="tpPct" type="number" value="10">
 
+  <label>
+    <input id="isLong" type="checkbox" checked> Long (Buy)?
+  </label>
+
   <button onclick="calculate()">Calculate</button>
 
   <h3 id="results"></h3>
@@ -28,8 +32,25 @@
       const entry = parseFloat(document.getElementById('entryPrice').value);
       const stopPct = parseFloat(document.getElementById('stopPct').value) / 100;
       const tpPct = parseFloat(document.getElementById('tpPct').value) / 100;
-      const stopLoss = entry * (1 - stopPct);
-      const takeProfit = entry * (1 + tpPct);
+      const isLong = document.getElementById('isLong').checked;
+
+      if (isNaN(entry)) {
+        document.getElementById('results').innerText = "Please enter a valid price.";
+        return;
+      }
+
+      let stopLoss, takeProfit;
+
+      if (isLong) {
+        // Long (buy): stop is BELOW entry, target is ABOVE entry
+        stopLoss = entry * (1 - stopPct);
+        takeProfit = entry * (1 + tpPct);
+      } else {
+        // Short (sell): stop is ABOVE entry, target is BELOW entry
+        stopLoss = entry * (1 + stopPct);
+        takeProfit = entry * (1 - tpPct);
+      }
+
       document.getElementById('results').innerText = 
         `Stop-Loss: ${stopLoss.toFixed(6)}, Take-Profit: ${takeProfit.toFixed(6)}`;
     }
